@@ -13,7 +13,7 @@ travel_aux([Current|Rest], Direction, {X, Y}, Visited) ->
         "L" -> NewDirection = change_dir(Direction, left)
     end,
     {Distance, _Rest} = string:to_integer( tl(Current) ),
-    case update_Visited(Visited, {X, Y}, Distance, NewDirection) of
+    case update_visited(Visited, {X, Y}, Distance, NewDirection) of
         {member, NewCoord} -> NewCoord;
         {not_member, NewVisited, NewCoord} -> travel_aux(Rest, NewDirection, NewCoord, NewVisited)
     end.
