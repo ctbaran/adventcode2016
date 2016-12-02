@@ -33,8 +33,8 @@ change_dir(Current, right) ->
         west -> north
     end.
 
-update_Visited(Visited, NewCoord, 0, _Direction) -> {not_member, Visited, NewCoord};
-update_Visited(Visited, {X, Y}, Distance, Direction) -> 
+update_visited(Visited, NewCoord, 0, _Direction) -> {not_member, Visited, NewCoord};
+update_visited(Visited, {X, Y}, Distance, Direction) -> 
     case Direction of
         north -> NewCoord = {X, Y+1};
         east -> NewCoord = {X+1,Y};
