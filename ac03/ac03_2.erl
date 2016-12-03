@@ -39,9 +39,7 @@ valid_triangles([], Count) -> Count;
 valid_triangles([Triangle|Triangles], Count) ->	
 	case is_valid_triangle(Triangle) of
 		true ->
-			io:fwrite("valid\n"),
 			valid_triangles(Triangles, Count + 1);
 		false ->
-			io:fwrite("invalid\n"),
 			valid_triangles(Triangles, Count)
 	end.
