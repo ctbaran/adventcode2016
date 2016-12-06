@@ -7,7 +7,6 @@ solve(File) ->
 	Processed = process_lines(Lines, dict:new()),
 	lists:foldl(fun ({_Position, Counts}, String) ->
 					Chars = dict:to_list(Counts),
-					io:fwrite("~p\n", [lists:keysort(2, Chars)]),
 					{Char, _} = hd(lists:keysort(2, Chars)),
 					String ++ [Char]
 				end,
