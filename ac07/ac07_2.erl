@@ -1,11 +1,11 @@
--module(ac07_1).
+-module(ac07_2).
 -export([solve/1]).
 
 solve(File) ->
 	{ok, FH} = file:open(File, [read]),
 	Lines = read(FH, []),
 	Addresses = lists:map( fun(X) -> extract_hypernet(X, false, [], [], []) end, Lines),
-	length( lists:filter( fun(X) -> address_supports(X) end, Addresses) ).
+	length( lists:filter( fun(X) -> supports_ssl(X) end, Addresses) ).
 
 read(File, Lines) ->
 	case file:read_line(File) of
@@ -28,12 +28,17 @@ extract_hypernet([Char|Rest], false, String, Regular, Hyper) ->
 extract_hypernet([Char|Rest], true, String, Regular, Hyper) -> 
 	extract_hypernet(Rest, true, [Char|String], Regular, Hyper).
 
-address_supports({Regular, Hypernet}) ->
-	case lists:foldl( fun (X, Acc) -> supports_tls(X) or Acc end, false, Hypernet) of
-		true -> false;
-		false -> lists:foldl(fun (X, Acc) -> supports_tls(X) or Acc end, false, Regular)
-	end.
+supports_ssl({Regular, Hypernet}) ->
+	ABAs = lists:flatmap( fun(X) -> get_abas(X, []) end, Regular),
+	lists:foldl( fun (X, Acc) -> has_matching_bab(X, ABAs) or Acc end, false, Hypernet).
 
-supports_tls([]) -> false.
-supports_tls([A,B,B,A|_]) when A /= B-> true;
-supports_tls([_|Rest]) -> supports_tls(Rest);
+get_abas([], ABAs) -> ABAs;
+get_abas([A,B,A|Rest], ABAs) when A /= B -> get_abas([B,A|Rest], [[A,B,A]|ABAs]);
+get_abas([_|Rest], ABAs) -> get_abas(Rest, ABAs).
+
+matching_bab([], _ABA) -> false;
+matching_bab([B,A,B|_], [A,B,A]) -> true;
+matching_bab([_|Rest], ABA) -> matching_bab(Rest, ABA).
+
+has_matching_bab(Hypernet, ABAs) ->
+	lists:foldl( fun(X,Acc) -> matching_bab(Hypernet, X) or Acc end, false, ABAs).
