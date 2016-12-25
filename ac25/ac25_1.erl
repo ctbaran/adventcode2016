@@ -1,5 +1,5 @@
 -module(ac25_1).
--export([solve/2, eval/3]).
+-export([solve/2]).
 
 solve(File, Registers) ->
 	{ok, FH} = file:open(File, [read]),
@@ -14,7 +14,8 @@ receiver(_Count, _State, undefined, N, ASM, Registers) ->
 							end,
 							dict:new(),
 							Registers),
-	Evaluator = spawn( ?MODULE, eval, [{[], ASM}, dict:store("a", N, RegDict), self()] ),
+	Self = self(),
+	Evaluator = spawn( fun () -> eval({[], ASM}, dict:store("a", N, RegDict), Self) end ),
 	receiver(0, 1, Evaluator, N, ASM, Registers);
 receiver(Count, State, Evaluator, N, ASM, Registers) ->
 	InvertState = (State + 1) rem 2,
